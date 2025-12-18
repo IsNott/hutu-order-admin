@@ -46,6 +46,7 @@
             <img src="@/assets/img/empty.png" />
             <p style="margin-top: 10px; font-size: 20px">Nothing to load....</p>
           </template>
+          <el-table-column type="index" width="50" align="center"/>
           <el-table-column prop="shopName" label="所属门店" align="center">
           </el-table-column>
           <el-table-column label="封面" width="120" align="center">

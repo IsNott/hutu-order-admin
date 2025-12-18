@@ -4,18 +4,8 @@
       <el-form ref="queryForm" :model="searchParam" label-width="80px">
         <el-row gutter="10">
           <el-col :span="6">
-            <el-form-item label="类型">
-              <el-select clearable v-model="searchParam.type" placeholder="请选择">
-                <el-option label="门店" value="0"></el-option>
-                <el-option label="首页活动" value="1"></el-option>
-                <el-option label="我的" value="2"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="创建时间">
-              <el-date-picker v-model="searchParam.createTime" placeholder="请输入创建时间" type="date" style="width: 100%"
-                value-format="yyyy-MM-dd" />
+            <el-form-item label="名称">
+              <el-input clearable v-model="searchParam.name" placeholder="请输入名称" />
             </el-form-item>
           </el-col>
           <el-col :span="6">
@@ -40,33 +30,25 @@
       </el-form>
     </div>
     <div class="list">
-      <el-table :data="imgList" stripe style="width: 100%" border v-loading="loading">
+      <el-table :data="dictList" stripe style="width: 100%" border v-loading="loading">
         <template #empty>
           <img src="@/assets/img/empty.png" />
           <p style="font-size: 20px">Nothing to load....</p>
         </template>
         <el-table-column type="index" width="50" align="center"/>
-        <el-table-column label="图片" width="120"  align="center">
-          <template #default="scope">
-            <img :src="scope.row.url" style="width: 64px; height: 64px;" />
-          </template>
+        <el-table-column prop="name" label="名称" width="120" show-overflow-tooltip align="center">
         </el-table-column>
-        <el-table-column label="类型" width="180" align="center">
-          <template #default="scope">
-            <span v-if="scope.row.type == 0">门店</span>
-            <span v-if="scope.row.type == 1">首页活动</span>
-            <span v-if="scope.row.type == 2">我的</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="index" label="排序" width="180" align="center">
-        </el-table-column>
-        <el-table-column prop="navigation" show-overflow-tooltip label="跳转路径"  align="center">
+        <el-table-column prop="remark" label="备注"  show-overflow-tooltip align="center">
         </el-table-column>
         <el-table-column prop="delFlag" label="状态" align="center" width="100">
           <template #default="scope">
             <el-tag v-if="scope.row.delFlag === 1" type="danger">已删除</el-tag>
               <el-tag v-else>正常</el-tag>
           </template>
+        </el-table-column>
+        <el-table-column prop="createTime" label="创建时间" width="180" align="center">
+        </el-table-column>
+        <el-table-column prop="updateTime" label="更新时间" width="180" align="center">
         </el-table-column>
         <el-table-column label="操作" width="200" align="center">
           <template #default="scope">
@@ -85,7 +67,7 @@
 <script setup>
 import { ref, reactive, onMounted, defineProps, defineEmits, watch, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { imageApi } from './api'
+import { dictApi } from './api'
 // Data
 const emptySearchParam = {}
 const emptyPage = {
@@ -94,7 +76,7 @@ const emptyPage = {
   total: 0
 }
 const searchParam = ref({})
-const imgList = ref([])
+const dictList = ref([])
 const page = ref(emptyPage)
 const loading = ref(false)
 const queryForm = ref(null)
@@ -120,13 +102,12 @@ onMounted(() => {
 // Methods
 const query = () => {
   loading.value = true
-  imageApi.queryPage(searchParam.value, page.value.page, page.value.size).then(res => {
-    console.log(res);
+  dictApi.query(searchParam.value, page.value.page, page.value.size).then(res => {
     if (res.code !== 200) {
       ElMessage.error(res.message)
       return
     }
-    imgList.value = res.data.records
+    dictList.value = res.data.records
     page.value.total = res.data.total
     page.value.size = res.data.size
   }).finally(() => {
@@ -154,7 +135,7 @@ const handleDelete = (row) => {
     cancelButtonText: '取消',
     type: 'warning'
   }).then(() => {
-    storeApi.delete(row.id).then(res => {
+    dictApi.delete(row.id).then(res => {
       if (res.code !== 200) {
         ElMessage.error(res.message)
         return

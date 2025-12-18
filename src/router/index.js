@@ -103,6 +103,14 @@ const routes = [
     },
     component: () => import('@/views/catalog/index.vue'),
   },
+  {
+    path: '/dict',
+    name: 'dict',
+    meta: {
+      title: '字典管理',
+    },
+    component: () => import('@/views/data-dict/index.vue'),
+  }
 
 ]
 

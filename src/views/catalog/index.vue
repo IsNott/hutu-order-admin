@@ -49,6 +49,7 @@
             <img src="@/assets/img/empty.png" />
             <p style="margin-top: 10px; font-size: 20px">Nothing to load....</p>
           </template>
+          <el-table-column type="index" width="50" align="center"/>
           <el-table-column prop="shopName" label="所属门店" align="center">
           </el-table-column>
           <el-table-column prop="name" label="名称" width="120" align="center">
@@ -261,7 +262,7 @@ const handleSizeChange = (size) => {
 
     .list {
       overflow-y: auto;
-      max-height: calc(100vh - 300px);
+      max-height: calc(100vh - 340px);
       margin-bottom: 30px;
     }
   }

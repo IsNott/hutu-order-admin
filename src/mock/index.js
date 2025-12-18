@@ -3,6 +3,10 @@ import { authTemplate } from './template/authTemplate'
 import { storeTemplate } from './template/storeTemplate'
 import { catalogTemplate } from './template/catalogTemplate'
 import { itemTemplate } from './template/itemTemplate'
+import { imageTemplate } from './template/imageTemplate'
+import { skuTemplate } from './template/skuTemplate'
+import { orderTemplate } from './template/orderTemplate'
+import { dictTemplate } from './template/dictTemplate'
 import { resp } from './template/'
 Mock.setup({
   timeout: 500
@@ -68,5 +72,26 @@ Mock.mock(/item\/details\/\d+/, 'get', itemTemplate.detail)
 Mock.mock(/item\/shopCatalogTree\/\d+/, 'get', itemTemplate.tree)
 Mock.mock(/item\/update\/\d+/, 'put', resp)
 Mock.mock(/item\/delete\/\d+/, 'delete', resp)
+
+
+Mock.mock(/image\/page\/\d+\/\d+/, 'post', imageTemplate.query)
+Mock.mock(/image\/details\/\d+/, 'get', imageTemplate.detail)
+Mock.mock(/image\/update\/\d+/, 'put', resp)
+Mock.mock(/image\/delete\/\d+/, 'delete', resp)
+
+Mock.mock(/sku\/page\/\d+\/\d+/, 'post', skuTemplate.query)
+Mock.mock(/sku\/details\/\d+/, 'get', skuTemplate.detail)
+Mock.mock(/sku\/update\/\d+/, 'put', resp)
+Mock.mock(/sku\/delete\/\d+/, 'delete', resp)
+
+Mock.mock(/order\/page\/\d+\/\d+/, 'post', orderTemplate.query)
+Mock.mock(/order\/details\/\d+/, 'get', orderTemplate.detail)
+Mock.mock(/order\/update\/\d+/, 'put', resp)
+Mock.mock(/order\/delete\/\d+/, 'delete', resp)
+
+Mock.mock(/dict\/page\/\d+\/\d+/, 'post', dictTemplate.query)
+Mock.mock(/dict\/details\/\d+/, 'get', dictTemplate.detail)
+Mock.mock(/dict\/update\/\d+/, 'put', resp)
+Mock.mock(/dict\/delete\/\d+/, 'delete', resp)
 
 console.log('已注册 Mock 路由:', Mock._mocked)

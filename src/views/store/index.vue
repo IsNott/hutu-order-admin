@@ -46,6 +46,7 @@
           <img src="@/assets/img/empty.png" />
           <p style="font-size: 20px">Nothing to load....</p>
         </template>
+        <el-table-column type="index" width="50" align="center"/>
         <el-table-column prop="name" label="名称" show-overflow-tooltip align="center">
         </el-table-column>
         <el-table-column prop="address" label="地址" width="240" show-overflow-tooltip align="center">
@@ -63,7 +64,7 @@
             <el-tag>{{ scope.row.openTime }} - {{ scope.row.closeTime }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="delFlag" label="状态" align="center" width="80">
+        <el-table-column prop="delFlag" label="状态" align="center" width="100">
           <template #default="scope">
             <el-tag v-if="scope.row.delFlag === 1" type="danger">已删除</el-tag>
               <el-tag v-else>正常</el-tag>
@@ -186,7 +187,7 @@ const handleDelete = (row) => {
 
   .list {
     overflow-y: auto;
-    max-height: calc(100vh - 300px);
+    max-height: calc(100vh - 340px);
     margin-bottom: 20px;
   }
 }

@@ -71,6 +71,13 @@ export const authTemplate = {
         type: 'folder',
         children: [
           {
+            name: '菜单管理',
+            icon: 'el-icon-menu',
+            path: '/menu',
+            type: 'menu',
+            index: 0
+          },
+          {
             name: '用户管理',
             icon: 'el-icon-user',
             path: '/user',
@@ -90,6 +97,13 @@ export const authTemplate = {
             path: '/permission',
             type: 'menu',
             index: 3
+          },
+          {
+            name: '字典管理',
+            icon: 'el-icon-s-tools',
+            path: '/dict',
+            type: 'menu',
+            index: 4
           }
         ]
       },
