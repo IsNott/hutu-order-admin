@@ -5,21 +5,21 @@
         <el-row gutter="10">
           <el-col :span="6">
             <el-form-item label="名称">
-              <el-input clearable v-model="searchParam.name" placeholder="请输入名称" />
+              <el-input clearable v-model="searchParam.shopName" placeholder="请输入名称" />
             </el-form-item>
           </el-col>
           <el-col :span="6">
             <el-form-item label="地址">
-              <el-input clearable v-model="searchParam.id" placeholder="请输入地址" />
+              <el-input clearable v-model="searchParam.address" placeholder="请输入地址" />
             </el-form-item>
           </el-col>
           <el-col :span="6">
             <el-form-item label="创建时间">
               <el-date-picker v-model="searchParam.createTime" placeholder="请输入创建时间" type="date" style="width: 100%"
-                value-format="yyyy-MM-dd" />
+                value-format="YYYY-MM-DD" />
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+          <!-- <el-col :span="6">
             <el-form-item label="状态">
               <el-select clearable v-model="searchParam.delFlag" placeholder="请选择">
                 <el-option label="全部" value=""></el-option>
@@ -27,7 +27,7 @@
                 <el-option label="正常" value="0"></el-option>
               </el-select>
             </el-form-item>
-          </el-col>
+          </el-col> -->
         </el-row>
         <el-row>
           <el-col :span="12">
@@ -47,29 +47,39 @@
           <p style="font-size: 20px">Nothing to load....</p>
         </template>
         <el-table-column type="index" width="50" align="center"/>
-        <el-table-column prop="name" label="名称" show-overflow-tooltip align="center">
+        <el-table-column prop="shopName" label="店名" show-overflow-tooltip align="center">
         </el-table-column>
         <el-table-column prop="address" label="地址" width="240" show-overflow-tooltip align="center">
         </el-table-column>
         <el-table-column prop="phone" label="联系电话" width="180" align="center">
         </el-table-column>
-        <el-table-column prop="status" label="营业状态" width="180" align="center">
+        <el-table-column label="是否总店" width="180" align="center">
           <template #default="scope">
-            <el-tag type="success" v-if="scope.row.status === 1">营业中</el-tag>
-            <el-tag type="info" v-else>暂停营业</el-tag>
+           <el-tag v-if="scope.row.mainShop == 1" type="success">是</el-tag>
+           <el-tag v-else type="info">否</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="经营状态" width="180" align="center">
+          <template #default="scope">
+           <el-switch v-model="scope.row.closeNow" :active-value="0" :inactive-value="1" active-text="是" inactive-text="否" />
+          </template>
+        </el-table-column>
+        <el-table-column label="经营日期" width="180" align="center">
+          <template #default="scope">
+            <span>{{ getWeekStr(scope.row.weekStartDate) }}至{{ getWeekStr(scope.row.weekEndDate) }}</span>
           </template>
         </el-table-column>
         <el-table-column label="营业时间" width="180" align="center">
           <template #default="scope">
-            <el-tag>{{ scope.row.openTime }} - {{ scope.row.closeTime }}</el-tag>
+            <el-tag>{{ scope.row.startBusinessTime }} - {{ scope.row.endBusinessTime }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="delFlag" label="状态" align="center" width="100">
+        <!-- <el-table-column prop="delFlag" label="状态" align="center" width="100">
           <template #default="scope">
             <el-tag v-if="scope.row.delFlag === 1" type="info">失效</el-tag>
               <el-tag v-else>正常</el-tag>
           </template>
-        </el-table-column>
+        </el-table-column> -->
         <!-- <el-table-column prop="createTime" label="创建时间" width="180" align="center">
         </el-table-column> -->
         <el-table-column label="操作" align="center">
@@ -90,6 +100,8 @@
 import { ref, reactive, onMounted, defineProps, defineEmits, watch, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { storeApi } from './api'
+import { getWeekStr } from '@/utils'
+import { get } from '@/utils/request'
 // Data
 const emptySearchParam = {}
 const emptyPage = {

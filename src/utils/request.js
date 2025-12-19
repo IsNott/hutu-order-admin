@@ -63,7 +63,18 @@ service.interceptors.response.use(
   error => {
     // HTTP状态码不为200的情况
     console.error('响应错误:', error)
-
+    if (error.response) {
+      const status = error.response.status
+      if (status === 401 || status === 403) {
+        ElMessage.error('登录已过期，请重新登录')
+        removeToken()
+        router.push('/login')
+      } else if (status === 500) {
+        ElMessage.error('服务器错误')
+      } else {
+        ElMessage.error(error.response.data.message || '请求失败')
+      }
+    }
     return Promise.reject(error)
   }
 )

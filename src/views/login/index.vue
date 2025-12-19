@@ -79,13 +79,12 @@ const handleLogin = () => {
   loginFormRef.value.validate((valid) => {
     if (valid) {
       loading.value = true
-      // 模拟登录请求
       loginApi.login(loginForm.value).then(res => {
           if (res.code !== 200) {
             ElMessage.error('登录失败: ' + res.message)
             return
           }
-          setToken(res.data.token)
+          setToken(res.data)
           router.push(redirect.value)
           ElMessage.success('登录成功')
         }).finally(() => {

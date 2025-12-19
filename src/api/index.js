@@ -1,15 +1,15 @@
 import { get, post, put, del } from '@/utils/request'
 export const indexContent = "hutu-admin"
 export const CommonAPI = {
-  getUserInfo(){
-    return get(`/user/info`)
-    
+  getUserInfo() {
+    return post(`/auth/info`)
+
   },
-  getMenu(){
+  getMenu() {
     return get(`/menu`)
   },
-  login(data){
-    return post(`/login`, data)
+  login(data) {
+    return post(`/auth/login`, data)
   },
 }
 

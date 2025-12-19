@@ -28,14 +28,15 @@ export default defineConfig({
     },
   },
   server: {
+    port: 8080,
     proxy: {
-      ['^/api']: {
+      '^/api': {
         target: `http://localhost:10220/hutu-admin`,
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api/, '')
       },
       // 静态文件
-      '/static': {
+      '^/static': {
         target: 'http://localhost:10220',
         changeOrigin: true,
 
