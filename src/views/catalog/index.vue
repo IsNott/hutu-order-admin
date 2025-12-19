@@ -26,7 +26,7 @@
               <el-form-item label="状态">
                 <el-select clearable v-model="searchParam.delFlag" placeholder="请选择">
                   <el-option label="全部" value=""></el-option>
-                  <el-option label="已删除" value="1"></el-option>
+                  <el-option label="失效" value="1"></el-option>
                   <el-option label="正常" value="0"></el-option>
                 </el-select>
               </el-form-item>
@@ -66,7 +66,7 @@
           </el-table-column>
           <el-table-column prop="delFlag" label="状态" align="center">
             <template #default="scope">
-              <el-tag v-if="scope.row.delFlag === 1" type="danger">已删除</el-tag>
+              <el-tag v-if="scope.row.delFlag === 1" type="info">失效</el-tag>
               <el-tag v-else>正常</el-tag>
             </template>
           </el-table-column>

@@ -27,7 +27,7 @@
           </template>
         </el-dropdown>
         <div class="github">
-          <a href="https://github.com/Isnott/hutu-order">
+          <a href="https://github.com/Isnott/hutu-order" target="_blank">
             <svg-icon icon-class="github" class="icons" />
           </a>
         </div>
