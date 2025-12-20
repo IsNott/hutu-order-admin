@@ -36,7 +36,7 @@
 
     <div class="main-container" v-if="showMainContainer">
       <div class="menu">
-        <el-menu :default-active="'1'" @select="handleSelect">
+        <el-menu :default-active="'1'" @select="handleSelect" v-loading="loading">
           <RecursiveMenu :menu-items="sortedMenuList" @select="handleSelect" />
         </el-menu>
       </div>
@@ -74,7 +74,7 @@ const loggedIn = ref(false)
 const breadcrumb = ref([])
 const menuList = ref([])
 const userInfo = ref({})
-
+const loading = ref(false)
 const showNavbar = computed(() => {
   return loggedIn.value && route.path !== '/login'
 })
@@ -108,11 +108,13 @@ const props = defineProps({})
 
 // Lifecycle hooks
 onMounted(() => {
+  loading.value = true
   checkLoginStatus()
   setTimeout(() => {
     queryMenus()
     queryUserInfo()
-  }, 200)
+    loading.value = false
+  }, 500)
 })
 
 const updateLoginStatus = () => {

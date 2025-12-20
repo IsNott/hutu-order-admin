@@ -4,10 +4,14 @@ export const storeApi = {
   quertStroePage(data, page, size) {
     return post(`/sysShopInfo/page/${page}/${size}`, data)
   },
-  details(id) {
-    return get(`/sysShopInfo/detail/${id}`)
+  add(data) {
+    return post(`/sysShopInfo/add`, data)
   },
-  update(id, data) {
+  details(id) {
+    return get(`/sysShopInfo/details/${id}`)
+  },
+  update(data) {
+    const id = data.id
     return put(`/sysShopInfo/update/${id}`, data)
   },
   delete(id) {

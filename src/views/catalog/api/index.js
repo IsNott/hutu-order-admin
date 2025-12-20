@@ -1,15 +1,15 @@
 import { get, post, put, del } from '@/utils/request'
- export const catalogApi = {
-  query(data, page, size){
-    return post(`/catalog/page/${page}/${size}`, data)
+export const catalogApi = {
+  query(data, page, size) {
+    return post(`/sysMenuCatalog/page/${page}/${size}`, data)
   },
-  details(id){
-    return get(`/catalog/detail/${id}`)
+  details(id) {
+    return get(`/sysMenuCatalog/details/${id}`)
   },
-  update(id, data){
-    return put(`/catalog/update/${id}`, data)
+  update(id, data) {
+    return put(`/sysMenuCatalog/update/${id}`, data)
   },
-  delete(id){
-    return del(`/catalog/delete/${id}`)
+  delete(id) {
+    return del(`/sysMenuCatalog/delete/${id}`)
   },
 }

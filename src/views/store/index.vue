@@ -32,7 +32,7 @@
         <el-row>
           <el-col :span="12">
             <el-form-item>
-              <el-button type="primary">新增</el-button>
+              <el-button type="primary" @click="handleAdd">新增</el-button>
               <el-button type="primary" @click="query">查询</el-button>
               <el-button @click="reset">重置</el-button>
             </el-form-item>
@@ -46,25 +46,26 @@
           <img src="@/assets/img/empty.png" />
           <p style="font-size: 20px">Nothing to load....</p>
         </template>
-        <el-table-column type="index" width="50" align="center"/>
+        <el-table-column type="index" width="50" align="center" />
         <el-table-column prop="shopName" label="店名" show-overflow-tooltip align="center">
         </el-table-column>
         <el-table-column prop="address" label="地址" width="240" show-overflow-tooltip align="center">
         </el-table-column>
         <el-table-column prop="phone" label="联系电话" width="180" align="center">
         </el-table-column>
-        <el-table-column label="是否总店" width="180" align="center">
+        <el-table-column label="是否总店" width="100" align="center">
           <template #default="scope">
-           <el-tag v-if="scope.row.mainShop == 1" type="success">是</el-tag>
-           <el-tag v-else type="info">否</el-tag>
+            <el-tag v-if="scope.row.mainShop == 1" type="success">是</el-tag>
+            <el-tag v-else type="info">否</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="经营状态" width="180" align="center">
+        <el-table-column label="店休中" width="180" align="center">
           <template #default="scope">
-           <el-switch v-model="scope.row.closeNow" :active-value="0" :inactive-value="1" active-text="是" inactive-text="否" />
+            <el-switch v-model="scope.row.closeNow" :active-value="1" :inactive-value="0" active-text="是"
+              inactive-text="否" @change="handleSwitch(scope.row)" />
           </template>
         </el-table-column>
-        <el-table-column label="经营日期" width="180" align="center">
+        <el-table-column label="营业日期" width="180" align="center">
           <template #default="scope">
             <span>{{ getWeekStr(scope.row.weekStartDate) }}至{{ getWeekStr(scope.row.weekEndDate) }}</span>
           </template>
@@ -74,12 +75,6 @@
             <el-tag>{{ scope.row.startBusinessTime }} - {{ scope.row.endBusinessTime }}</el-tag>
           </template>
         </el-table-column>
-        <!-- <el-table-column prop="delFlag" label="状态" align="center" width="100">
-          <template #default="scope">
-            <el-tag v-if="scope.row.delFlag === 1" type="info">失效</el-tag>
-              <el-tag v-else>正常</el-tag>
-          </template>
-        </el-table-column> -->
         <!-- <el-table-column prop="createTime" label="创建时间" width="180" align="center">
         </el-table-column> -->
         <el-table-column label="操作" align="center">
@@ -93,15 +88,16 @@
     <el-pagination v-model:current-page="page.page" v-model:page-size="page.size" :page-sizes="[20, 50, 100, 200]"
       background layout="total, sizes, prev, pager, next, jumper" :total="page.total" @size-change="handleSizeChange"
       @current-change="query" />
+    <EditForm @close="handleClose" :title="title" :row-id="selectedId" :dialogVisible="dialogVisible" />
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, defineProps, defineEmits, watch, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import EditForm from './components/EditForm.vue'
 import { storeApi } from './api'
 import { getWeekStr } from '@/utils'
-import { get } from '@/utils/request'
 // Data
 const emptySearchParam = {}
 const emptyPage = {
@@ -114,6 +110,9 @@ const storeList = ref([])
 const page = ref(emptyPage)
 const loading = ref(false)
 const queryForm = ref(null)
+const title = ref('新增门店')
+const dialogVisible = ref(false)
+const selectedId = ref(null)
 // Computed
 
 // Emits
@@ -150,6 +149,23 @@ const query = () => {
   })
 }
 
+const handleAdd = () => {
+  title.value = '新增门店'
+  dialogVisible.value = true
+}
+
+
+const handleSwitch = (row) => {
+  storeApi.update(row.id, row).then(res => {
+    if (res.code !== 200) {
+      ElMessage.error(res.message)
+      return
+    }
+    ElMessage.success(res.message)
+    query()
+  })
+}
+
 const handleSizeChange = (size) => {
   page.value.size = size
   query()
@@ -161,8 +177,16 @@ const reset = () => {
   page.value = emptyPage
   query()
 }
-const handleEdit = (row) => {
 
+const handleClose = () => {
+  selectedId.value = null
+  dialogVisible.value = false
+  query()
+}
+const handleEdit = (row) => {
+  title.value = '编辑门店'
+  dialogVisible.value = true
+  selectedId.value = row.id
 }
 const handleDelete = (row) => {
   ElMessageBox.confirm('确定要删除吗？', '提示', {

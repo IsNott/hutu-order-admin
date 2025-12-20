@@ -29,6 +29,9 @@ export default defineConfig({
   },
   server: {
     port: 8080,
+    hmr: {
+      overlay: false
+    },
     proxy: {
       '^/api': {
         target: `http://localhost:10220/hutu-admin`,
