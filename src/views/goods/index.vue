@@ -1,87 +1,79 @@
 <template>
   <div class="contianer">
-    <div class="left">
+    <!-- <div class="left">
       <div class="title">
         门店分类树
       </div>
       <el-tree :data="shopCatalogTree" node-key="index" v-loading="tLoading" :props="defaultProps"
         @node-click="handleNodeClick" />
     </div>
-    <div class="right">
-      <div class="query-form">
-        <el-form ref="queryForm" :model="searchParam" label-width="80px">
-          <el-row gutter="10">
-            <el-col :span="6">
-              <el-form-item label="名称">
-                <el-input clearable v-model="searchParam.name" placeholder="请输入名称" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item label="创建时间">
-                <el-date-picker v-model="searchParam.createTime" placeholder="请输入创建时间" type="date" style="width: 100%"
-                  value-format="yyyy-MM-dd" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item label="状态">
-                <el-select clearable v-model="searchParam.delFlag" placeholder="请选择">
-                  <el-option label="全部" value=""></el-option>
-                  <el-option label="失效" value="1"></el-option>
-                  <el-option label="正常" value="0"></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item>
-                <el-button type="primary" @click="queryCatalog">查询</el-button>
-                <el-button @click="reset">重置</el-button>
-              </el-form-item>
-            </el-col>
-          </el-row>
-        </el-form>
-      </div>
-      <div class="list">
-        <el-table :data="itemList" border style="width: 100%" v-loading="loading">
-          <template #empty>
-            <img src="@/assets/img/empty.png" />
-            <p style="margin-top: 10px; font-size: 20px">Nothing to load....</p>
-          </template>
-          <el-table-column type="index" width="50" align="center"/>
-          <el-table-column prop="shopName" label="所属门店" align="center">
-          </el-table-column>
-          <el-table-column label="封面" width="120" align="center">
-            <template #default="scope">
-              <img :src="scope.row.cover" style="width: 64px; height: 64px" />
-            </template>
-          </el-table-column>
-          <el-table-column prop="name" label="名称" width="120" align="center">
-          </el-table-column>
-          <el-table-column prop="price" label="单价" width="120" align="center">
-          </el-table-column>
-          <el-table-column prop="index" label="排序" width="80" align="center">
-          </el-table-column>
-          <el-table-column prop="description" label="描述" width="160" show-overflow-tooltip align="center">
-          </el-table-column>
-          <el-table-column prop="delFlag" label="状态" align="center">
-            <template #default="scope">
-              <el-tag v-if="scope.row.delFlag === 1" type="info">失效</el-tag>
-              <el-tag v-else>正常</el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column prop="createTime" label="创建时间" width="180" align="center">
-          </el-table-column>
-          <el-table-column label="操作" align="center">
-            <template #default="scope">
-              <el-button type="primary" size="small" @click="handleEdit(scope.row)">编辑</el-button>
-              <el-button type="danger" size="small" @click="handleDelete(scope.row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-      <el-pagination v-model:current-page="page.page" v-model:page-size="page.size" :page-sizes="[20, 50, 100, 200]"
-        background layout="total, sizes, prev, pager, next, jumper" :total="page.total" @size-change="handleSizeChange"
-        @current-change="queryItem" />
+    <div class="right"> -->
+    <div class="query-form">
+      <el-form ref="queryForm" :model="searchParam" label-width="80px">
+        <el-row gutter="10">
+          <el-col :span="6">
+            <el-form-item label="名称">
+              <el-input clearable v-model="searchParam.name" placeholder="请输入名称" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="创建时间">
+              <el-date-picker v-model="searchParam.createTime" placeholder="请输入创建时间" type="date" style="width: 100%"
+                value-format="yyyy-MM-dd" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="状态">
+              <el-select clearable v-model="searchParam.delFlag" placeholder="请选择">
+                <el-option label="全部" value=""></el-option>
+                <el-option label="失效" value="1"></el-option>
+                <el-option label="正常" value="0"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item>
+              <el-button type="primary" @click="queryCatalog">查询</el-button>
+              <el-button @click="reset">重置</el-button>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
     </div>
+    <div class="list">
+      <el-table :data="itemList" border style="width: 100%" v-loading="loading">
+        <template #empty>
+          <img src="@/assets/img/empty.png" />
+          <p style="margin-top: 10px; font-size: 20px">Nothing to load....</p>
+        </template>
+        <el-table-column type="index" width="50" align="center" />
+        <el-table-column label="封面" width="120" align="center">
+          <template #default="scope">
+            <img :src="scope.row.cover" style="width: 64px; height: 64px" />
+          </template>
+        </el-table-column>
+        <el-table-column prop="itemName" label="名称" width="120" align="center">
+        </el-table-column>
+        <el-table-column prop="itemPrice" label="单价" width="120" align="center">
+        </el-table-column>
+        <el-table-column prop="showIndex" label="排序" width="80" align="center">
+        </el-table-column>
+        <el-table-column prop="expectMakeTime" label="预计制作时长" width="120" align="center">
+        </el-table-column>
+        <el-table-column prop="itemDescription" label="描述"  show-overflow-tooltip align="center">
+        </el-table-column>
+        <el-table-column label="操作" width="160" align="center">
+          <template #default="scope">
+            <el-button type="primary" size="small" @click="handleEdit(scope.row)">编辑</el-button>
+            <el-button type="danger" size="small" @click="handleDelete(scope.row)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+    <el-pagination v-model:current-page="page.page" v-model:page-size="page.size" :page-sizes="[20, 50, 100, 200]"
+      background layout="total, sizes, prev, pager, next, jumper" :total="page.total" @size-change="handleSizeChange"
+      @current-change="queryItem" />
+    <!-- </div> -->
   </div>
 </template>
 
@@ -228,59 +220,23 @@ const handleSizeChange = (size) => {
 
 <style scoped lang="scss">
 .contianer {
-  display: flex;
-  width: 100%;
-  // height: 100vh;
-
-  .left {
-    width: 240px;
-    height: 100%;
-    overflow: auto;
-    // background-color: #f5f5f5;
+  .query-form {
+    margin-bottom: 20px;
   }
 
-  .title {
-    padding: 10px;
-    font-size: 16px;
-    // font-weight: bold;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 10px;
-    text-align: center;
+  .el-table {
+    // margin-bottom: 30px;
   }
 
-  .el-tree {
-    height: 100%;
-    width: 100%;
+  .el-pagination {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .list {
     overflow-y: auto;
-    overflow-x: hidden;
-
-    ::-webkit-scrollbar {
-      display: none;
-    }
-  }
-
-  .right {
-    flex: 1;
-    width: calc(100% - 280px);
-
-    .query-form {
-      margin-bottom: 20px;
-    }
-
-    .el-table {
-      // margin-bottom: 30px;
-    }
-
-    .el-pagination {
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    .list {
-      overflow-y: scroll;
-      height: calc(100vh - 300px);
-      margin-bottom: 30px;
-    }
+    max-height: calc(100vh - 340px);
+    margin-bottom: 20px;
   }
 }
 </style>

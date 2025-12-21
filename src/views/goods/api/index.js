@@ -1,18 +1,18 @@
 import { get, post, put, del } from '@/utils/request'
- export const itemApi = {
-  shopCatalogTree(parentId){
-    return get(`/item/shopCatalogTree/${parentId}`)
+export const itemApi = {
+  shopCatalogTree(parentId) {
+    return get(`/sysProduct/shopCatalogTree/${parentId}`)
   },
-  query(data, page, size){
-    return post(`/item/page/${page}/${size}`, data)
+  query(data, page, size) {
+    return post(`/sysProduct/page/${page}/${size}`, data)
   },
-  details(id){
-    return get(`/item/detail/${id}`)
+  details(id) {
+    return get(`/sysProduct/detail/${id}`)
   },
-  update(id, data){
-    return put(`/item/update/${id}`, data)
+  update(id, data) {
+    return put(`/sysProduct/update/${id}`, data)
   },
-  delete(id){
-    return del(`/item/delete/${id}`)
+  delete(id) {
+    return del(`/sysProduct/delete/${id}`)
   },
 }
