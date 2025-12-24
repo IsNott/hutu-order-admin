@@ -6,6 +6,9 @@
           <el-option v-for="item in stores" :key="item.id" :label="item.shopName" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="分类名称" prop="name">
+        <el-input v-model="editForm.menuCatalogName" placeholder="请输入分类名称" />
+      </el-form-item>
       <el-form-item label="排序" prop="showIndex">
         <el-input v-model="editForm.showIndex" placeholder="请输入排序" />
       </el-form-item>
@@ -39,6 +42,10 @@ const props = defineProps({
   dialogVisible: {
     type: Boolean,
     default: false
+  },
+  selectedStoreId: {
+    type: String,
+    required: false,
   }
 })
 
@@ -76,20 +83,6 @@ const weekOptions = [
   { label: '周日', value: 7 }
 ]
 
-watch(() => props.dialogVisible, (val) => {
-  if (val) {
-    editForm.value = { ...empty }
-    if (props.rowId) {
-      catalogApi.details(props.rowId).then(res => {
-        if (res.code !== 200) {
-          ElMessage.error(res.message)
-          return
-        }
-        editForm.value = res.data
-      })
-    }
-  }
-})
 
 onMounted(() => {
   storeApi.quertStroePage({}, 1, 100).then(res => {
@@ -99,6 +92,22 @@ onMounted(() => {
     }
     stores.value = res.data.records
   })
+  console.log('prop', props);
+  
+  if(props.selectedStoreId){
+    editForm.value.shopId = props.selectedStoreId
+    console.log(editForm.value.shopId);
+  }
+
+  if (props.rowId) {
+    catalogApi.details(props.rowId).then(res => {
+      if (res.code !== 200) {
+        ElMessage.error(res.message)
+        return
+      }
+      editForm.value = res.data
+    })
+  }
 })
 
 const submitEdit = () => {
@@ -106,7 +115,7 @@ const submitEdit = () => {
     if (!valid) {
       return
     }
-    const apiCall = editForm.value.id ? storeApi.update : storeApi.add
+    const apiCall = editForm.value.id ? catalogApi.update : catalogApi.add
     const res = await apiCall(editForm.value)
     if (res.code !== 200) {
       ElMessage.error(res.message)

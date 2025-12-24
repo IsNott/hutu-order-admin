@@ -3,6 +3,9 @@ export const catalogApi = {
   query(data, page, size) {
     return post(`/sysMenuCatalog/page/${page}/${size}`, data)
   },
+  add(data) {
+    return post(`/sysMenuCatalog/add`, data)
+  },
   details(id) {
     return get(`/sysMenuCatalog/details/${id}`)
   },
@@ -12,4 +15,7 @@ export const catalogApi = {
   delete(id) {
     return del(`/sysMenuCatalog/delete/${id}`)
   },
+  copy2shop(data){
+    return post(`/sysMenuCatalog/copy2Shops`, data)
+  }
 }

@@ -19,15 +19,6 @@
                 value-format="YYYY-MM-DD" />
             </el-form-item>
           </el-col>
-          <!-- <el-col :span="6">
-            <el-form-item label="状态">
-              <el-select clearable v-model="searchParam.delFlag" placeholder="请选择">
-                <el-option label="全部" value=""></el-option>
-                <el-option label="失效" value="1"></el-option>
-                <el-option label="正常" value="0"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col> -->
         </el-row>
         <el-row>
           <el-col :span="12">
@@ -75,8 +66,6 @@
             <el-tag>{{ scope.row.startBusinessTime }} - {{ scope.row.endBusinessTime }}</el-tag>
           </template>
         </el-table-column>
-        <!-- <el-table-column prop="createTime" label="创建时间" width="180" align="center">
-        </el-table-column> -->
         <el-table-column label="操作" align="center">
           <template #default="scope">
             <el-button type="primary" size="small" @click="handleEdit(scope.row)">编辑</el-button>
@@ -88,7 +77,7 @@
     <el-pagination v-model:current-page="page.page" v-model:page-size="page.size" :page-sizes="[20, 50, 100, 200]"
       background layout="total, sizes, prev, pager, next, jumper" :total="page.total" @size-change="handleSizeChange"
       @current-change="query" />
-    <EditForm @close="handleClose" :title="title" :row-id="selectedId" :dialogVisible="dialogVisible" />
+    <EditForm :key="formKey" @close="handleClose" :title="title" :row-id="selectedId" :dialogVisible="dialogVisible" />
   </div>
 </template>
 
@@ -113,6 +102,7 @@ const queryForm = ref(null)
 const title = ref('新增门店')
 const dialogVisible = ref(false)
 const selectedId = ref(null)
+const formKey = ref(0)
 // Computed
 
 // Emits
@@ -152,6 +142,7 @@ const query = () => {
 const handleAdd = () => {
   title.value = '新增门店'
   dialogVisible.value = true
+  formKey.value = Math.random()
 }
 
 
@@ -187,6 +178,7 @@ const handleEdit = (row) => {
   title.value = '编辑门店'
   dialogVisible.value = true
   selectedId.value = row.id
+  formKey.value = Math.random()
 }
 const handleDelete = (row) => {
   ElMessageBox.confirm('确定要删除吗？', '提示', {

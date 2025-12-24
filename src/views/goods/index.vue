@@ -13,27 +13,18 @@
         <el-row gutter="10">
           <el-col :span="6">
             <el-form-item label="名称">
-              <el-input clearable v-model="searchParam.name" placeholder="请输入名称" />
+              <el-input clearable v-model="searchParam.itemName" placeholder="请输入名称" />
             </el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-form-item label="创建时间">
-              <el-date-picker v-model="searchParam.createTime" placeholder="请输入创建时间" type="date" style="width: 100%"
-                value-format="yyyy-MM-dd" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="状态">
-              <el-select clearable v-model="searchParam.delFlag" placeholder="请选择">
-                <el-option label="全部" value=""></el-option>
-                <el-option label="失效" value="1"></el-option>
-                <el-option label="正常" value="0"></el-option>
-              </el-select>
+            <el-form-item label="描述">
+              <el-input clearable v-model="searchParam.itemDescription" placeholder="请输入描述" />
             </el-form-item>
           </el-col>
           <el-col :span="6">
             <el-form-item>
-              <el-button type="primary" @click="queryCatalog">查询</el-button>
+              <el-button type="primary" @click="handleAdd">新增</el-button>
+              <el-button type="primary" @click="queryItem">查询</el-button>
               <el-button @click="reset">重置</el-button>
             </el-form-item>
           </el-col>
@@ -49,16 +40,20 @@
         <el-table-column type="index" width="50" align="center" />
         <el-table-column label="封面" width="120" align="center">
           <template #default="scope">
-            <img :src="scope.row.cover" style="width: 64px; height: 64px" />
+            <img :src="scope.row.coverUrl" style="width: 64px; height: 64px" />
           </template>
         </el-table-column>
         <el-table-column prop="itemName" label="名称" width="120" align="center">
         </el-table-column>
-        <el-table-column prop="itemPrice" label="单价" width="120" align="center">
+        <el-table-column label="单价" width="120" align="center">
+          <template #default="scope">
+            <span v-if="scope.row.itemPrice">{{ scope.row.itemPrice }}元</span>
+          </template>
         </el-table-column>
-        <el-table-column prop="showIndex" label="排序" width="80" align="center">
-        </el-table-column>
-        <el-table-column prop="expectMakeTime" label="预计制作时长" width="120" align="center">
+        <el-table-column label="预计制作时长" width="120" align="center">
+          <template #default="scope" >
+            <span v-if="scope.row.expectMakeTime">{{ scope.row.expectMakeTime }} 分钟</span>
+          </template>
         </el-table-column>
         <el-table-column prop="itemDescription" label="描述"  show-overflow-tooltip align="center">
         </el-table-column>
@@ -73,6 +68,7 @@
     <el-pagination v-model:current-page="page.page" v-model:page-size="page.size" :page-sizes="[20, 50, 100, 200]"
       background layout="total, sizes, prev, pager, next, jumper" :total="page.total" @size-change="handleSizeChange"
       @current-change="queryItem" />
+      <EditForm :key="formKey" @close="handleClose" :title="title" :row-id="selectedId" :dialogVisible="dialogVisible" />
     <!-- </div> -->
   </div>
 </template>
@@ -81,6 +77,7 @@
 import { ref, reactive, onMounted, defineProps, defineEmits, watch, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { itemApi } from './api'
+import EditForm from './components/EditForm.vue'
 // Data
 const defaultProps = {
   children: 'children',
@@ -100,6 +97,12 @@ const page = ref(emptyPage)
 const loading = ref(false)
 const queryForm = ref(null)
 const shopCatalogTree = ref([])
+
+const title = ref('新增商品')
+const dialogVisible = ref(false)
+const selectedId = ref(null)
+const formKey = ref(0)
+
 // Computed
 // Emits
 const emit = defineEmits([
@@ -113,7 +116,7 @@ const props = defineProps({
 
 // Lifecycle hooks
 onMounted(() => {
-  quertTree()
+  // quertTree()
   queryItem()
 })
 
@@ -177,6 +180,25 @@ const reset = () => {
   queryItem()
 }
 
+const handleAdd = () => {
+  title.value = '新增商品'
+  dialogVisible.value = true
+  formKey.value = Math.random()
+}
+
+const handleClose = () => {
+  selectedId.value = null
+  dialogVisible.value = false
+  queryItem()
+}
+
+const handleEdit = (row) => {
+  title.value = '编辑商品'
+  dialogVisible.value = true
+  selectedId.value = row.id
+  formKey.value = Math.random()
+}
+
 const switchShow = (row) => {
   if (row.showSide === 1) {
     row.showSide = 0
@@ -215,6 +237,23 @@ const handleNodeClick = (node) => {
 const handleSizeChange = (size) => {
   page.value.size = size
   queryItem()
+}
+
+const handleDelete = (row) => {
+  ElMessageBox.confirm('确定要删除吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    itemApi.delete(row.id).then(res => {
+      if (res.code !== 200) {
+        ElMessage.error(res.message)
+        return
+      }
+      ElMessage.success(res.message)
+      query()
+    })
+  })
 }
 </script>
 

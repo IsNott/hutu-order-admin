@@ -28,7 +28,7 @@ export default defineConfig({
     },
   },
   server: {
-    port: 8080,
+    port: 10333,
     hmr: {
       overlay: false
     },
@@ -43,6 +43,11 @@ export default defineConfig({
         target: 'http://localhost:10220',
         changeOrigin: true,
 
+      },
+      '^/upload': {
+        target: 'http://localhost:10220/hutu-oss',
+        rewrite: path => path.replace(/^\/upload/, ''),
+        changeOrigin: true,
       }
     }
   }

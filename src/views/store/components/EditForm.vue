@@ -77,7 +77,7 @@
 </template>
 
 <script setup>
-import { ref, defineEmits, defineProps, watch } from 'vue'
+import { ref, defineEmits, defineProps, watch, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { storeApi } from '../api'
 
@@ -147,10 +147,8 @@ const weekOptions = [
   { label: '周日', value: 7 }
 ]
 
-watch(() => props.dialogVisible, (val) => {
-  if (val) {
-    editForm.value = { ...empty }
-    if (props.rowId) {
+onMounted(async () => { 
+  if (props.rowId) {
       storeApi.details(props.rowId).then(res => {
         if (res.code !== 200) {
           ElMessage.error(res.message)
@@ -159,7 +157,6 @@ watch(() => props.dialogVisible, (val) => {
         editForm.value = res.data
       })
     }
-  }
 })
 
 const submitEdit = () => {

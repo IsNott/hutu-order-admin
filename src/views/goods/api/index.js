@@ -7,12 +7,15 @@ export const itemApi = {
     return post(`/sysProduct/page/${page}/${size}`, data)
   },
   details(id) {
-    return get(`/sysProduct/detail/${id}`)
+    return get(`/sysProduct/details/${id}`)
   },
-  update(id, data) {
-    return put(`/sysProduct/update/${id}`, data)
+  update(data) {
+    return put(`/sysProduct/update/${data.id}`, data)
   },
   delete(id) {
     return del(`/sysProduct/delete/${id}`)
+  },
+  add(data) {
+    return post(`/sysProduct/add`, data)
   },
 }
