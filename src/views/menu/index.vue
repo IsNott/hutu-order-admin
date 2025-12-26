@@ -14,6 +14,7 @@
           <el-col :span="12">
             <el-form-item>
               <el-button type="primary" @click="handleAdd(1)">新增目录</el-button>
+              <el-button type="primary" @click="handleAdd(2)">新增菜单</el-button>
               <el-button type="primary" @click="query">查询</el-button>
               <el-button @click="reset">重置</el-button>
             </el-form-item>
@@ -49,7 +50,10 @@
         <el-table-column prop="permission" label="权限标识" width="230" align="center"></el-table-column>
         <el-table-column label="操作" align="center">
           <template #default="scope">
-            <el-button type="primary" size="small" v-if="scope.row.type == 1" @click="handleAdd(2, scope.row.id)">添加菜单</el-button>
+            <el-button type="primary" size="small" v-if="scope.row.type == 1" @click="handleAdd(null, scope.row.id)">添加</el-button>
+            <el-button type="primary" plain size="small" @click="hadnleUpdate(scope.row.id)">
+              更改上级
+            </el-button>
             <el-button type="primary" size="small" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button type="danger" size="small" @click="handleDelete(scope.row)">删除</el-button>
           </template>
@@ -88,7 +92,7 @@ const dialogVisible = ref(false)
 const selectedId = ref(null)
 const formKey = ref(0)
 const addType = ref(1)
-const parentId = ref(null)
+const parentId = ref('')
 // Computed
 
 // Emits
@@ -124,10 +128,12 @@ const query = () => {
   })
 }
 
-const handleAdd = (type, parentId) => {
-  addType.value = type
-  if(parentId){
-    parentId.value = parentId
+const handleAdd = (type, pid) => {
+  if(type){
+    addType.value = type
+  }
+  if(pid){
+    parentId.value = pid
   }
   title.value = '新增系统菜单'
   dialogVisible.value = true

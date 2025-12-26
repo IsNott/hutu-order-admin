@@ -41,7 +41,7 @@
       <el-row>
         <el-col :span="12">
           <el-form-item label="菜单类型" prop="type">
-            <el-select clearable v-model="props.type" disabled placeholder="请选择">
+            <el-select clearable v-model="editForm.type" :disabled="props.type == null" placeholder="请选择">
               <el-option label="目录" :value="1"></el-option>
               <el-option label="菜单" :value="2"></el-option>
               <el-option label="按钮" :value="3"></el-option>
@@ -91,7 +91,7 @@ const props = defineProps({
     default: null
   },
   parentId: {
-    type: Number,
+    type: String,
     default: null
   }
 })
