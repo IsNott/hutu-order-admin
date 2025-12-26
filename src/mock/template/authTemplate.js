@@ -17,21 +17,21 @@ export const authTemplate = {
     data: [
       {
         name: '首页',
-        icon: 'el-icon-s-home',
+        icon: 'home',
         path: '/',
         index: 1,
         type: 'menu'
       },
       {
         name: '门店管理',
-        icon: 'el-icon-s-goods',
+        icon: 'goods',
         path: '/store',
         type: 'menu',
         index: 2
       },
       {
         name: '分类管理',
-        icon: 'el-icon-s-goods',
+        icon: 'goods',
         path: '/catalog',
         type: 'menu',
         index: 3

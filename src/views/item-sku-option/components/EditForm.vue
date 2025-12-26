@@ -1,0 +1,125 @@
+<template>
+    <el-dialog :title="title" :model-value="dialogVisible" width="600px" :before-close="handleClose">
+        <el-form ref="editFormRef" :rules="rules" :model="editForm" label-width="100px">
+                                <el-form-item label="规格ID" prop="specId">
+                        <el-input v-model="editForm.specId" :placeholder="'请输入规格ID'" />
+                    </el-form-item>
+                    <el-form-item label="选项名称" prop="optionLabel">
+                        <el-input v-model="editForm.optionLabel" :placeholder="'请输入选项名称'" />
+                    </el-form-item>
+                    <el-form-item label="选项code" prop="optionCode">
+                        <el-input v-model="editForm.optionCode" :placeholder="'请输入选项code'" />
+                    </el-form-item>
+                    <el-form-item label="父级ID" prop="parentId">
+                        <el-input v-model="editForm.parentId" :placeholder="'请输入父级ID'" />
+                    </el-form-item>
+                    <el-form-item label="附加价格" prop="additionalPrice">
+                        <el-input v-model="editForm.additionalPrice" :placeholder="'请输入附加价格'" />
+                    </el-form-item>
+                    <el-form-item label="目前是否禁用" prop="nowDisabled">
+                        <el-input v-model="editForm.nowDisabled" :placeholder="'请输入目前是否禁用'" />
+                    </el-form-item>
+                    <el-form-item label="排序" prop="sortOrder">
+                        <el-input v-model="editForm.sortOrder" :placeholder="'请输入排序'" />
+                    </el-form-item>
+        </el-form>
+        <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="handleClose">取 消</el-button>
+        <el-button type="primary" @click="submitEdit">确 定</el-button>
+      </span>
+        </template>
+    </el-dialog>
+</template>
+
+<script setup>
+    import { ref, defineEmits, defineProps, watch, onMounted } from 'vue'
+    import { ElMessage } from 'element-plus'
+    import { itemSkuOptionApi } from '../api'
+
+    const props = defineProps({
+        title: {
+            type: String,
+            default: '操作'
+        },
+        rowId: {
+            type: Number,
+            required: false,
+        },
+        dialogVisible: {
+            type: Boolean,
+            default: false
+        }
+    })
+
+    const emit = defineEmits(['close', 'update:dialogVisible'])
+    const empty = {}
+    const editForm = ref(empty)
+    const editFormRef = ref(null)
+
+    const rules = {
+        specId: [
+            { required: true, message: '请输入规格ID', trigger: 'blur' }
+        ],
+        optionLabel: [
+            { required: true, message: '请输入选项名称', trigger: 'blur' }
+        ],
+        optionCode: [
+            { required: true, message: '请输入选项code', trigger: 'blur' }
+        ],
+        parentId: [
+            { required: true, message: '请输入父级ID', trigger: 'blur' }
+        ],
+        additionalPrice: [
+            { required: true, message: '请输入附加价格', trigger: 'blur' }
+        ],
+        nowDisabled: [
+            { required: true, message: '请输入目前是否禁用', trigger: 'blur' }
+        ],
+        sortOrder: [
+            { required: true, message: '请输入排序', trigger: 'blur' }
+        ],
+    }
+
+    onMounted(async () => {
+        if (props.rowId) {
+            itemSkuOptionApi.details(props.rowId).then(res => {
+                if (res.code !== 200) {
+                    ElMessage.error(res.message)
+                    return
+                }
+                editForm.value = res.data
+            })
+        }
+    })
+
+    const submitEdit = () => {
+        editFormRef.value?.validate(async (valid) => {
+            if (!valid) {
+                return
+            }
+            const apiCall = editForm.value.id ? itemSkuOptionApi.update : itemSkuOptionApi.add
+            const res = await apiCall(editForm.value)
+            if (res.code !== 200) {
+                ElMessage.error(res.message)
+                return
+            }
+            ElMessage.success(res.message)
+            handleClose()
+        })
+    }
+
+    const handleClose = () => {
+        emit('update:dialogVisible', false)
+        emit('close')
+        editForm.value = { ...empty }
+        editFormRef.value?.resetFields()
+        editFormRef.value?.clearValidate()
+    }
+</script>
+
+<style scoped lang="scss">
+    ::v-deep(.el-dialog__footer) {
+        text-align: center;
+    }
+</style>

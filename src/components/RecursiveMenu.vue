@@ -2,16 +2,20 @@
 <template>
   <template v-for="item in menuItems" :key="item.index">
     <!-- 没有子菜单的项 -->
-    <el-menu-item v-if="item.type === 'menu'" :index="getIndexPath(item)">
+    <el-menu-item v-if="!item.hasChildren" :index="getIndexPath(item)">
       <!-- <svg-icon :icon-class="item.icon" /> -->
-      <component :is="item.icon"/>
+      <el-icon>
+        <component :is="getIconComponent(item.icon)" />
+      </el-icon>
       <span>{{ item.name }}</span>
     </el-menu-item>
 
     <!-- 有子菜单的项 -->
     <el-sub-menu v-else :index="getIndexPath(item)">
       <template #title>
-        <svg-icon :icon-class="item.icon" />
+        <el-icon>
+          <component :is="getIconComponent(item.icon)" />
+        </el-icon>
         <span>{{ item.name }}</span>
       </template>
       <!-- 递归调用 -->
@@ -22,6 +26,7 @@
 
 <script setup>
 import { defineProps, defineEmits, computed } from 'vue'
+import { getIconComponent } from '@/utils'
 
 const props = defineProps({
   menuItems: {
