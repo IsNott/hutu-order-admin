@@ -2,19 +2,14 @@
   <div class="contianer">
     <div class="query-form">
       <el-form ref="queryForm" :model="searchParam" label-width="80px">
-        <!-- <el-row gutter="10">
-          <el-col :span="6">
-            <el-form-item label="创建时间">
-              <el-date-picker v-model="searchParam.createTime" placeholder="请输入创建时间" type="date" style="width: 100%"
-                value-format="YYYY-MM-DD" />
-            </el-form-item>
-          </el-col>
-        </el-row> -->
         <el-row>
           <el-col :span="12">
             <el-form-item>
-              <el-button type="primary" @click="handleAdd(1)">新增目录</el-button>
+              <el-button type="primary" @click="handleCreatDir()">新增目录</el-button>
               <el-button type="primary" @click="handleAdd(2)">新增菜单</el-button>
+              <el-button type="primary" plain v-if="selectMenus.length > 0" @click="handleChangeParent">
+                更改上级
+              </el-button>
               <el-button type="primary" @click="query">查询</el-button>
               <el-button @click="reset">重置</el-button>
             </el-form-item>
@@ -23,16 +18,17 @@
       </el-form>
     </div>
     <div class="list">
-      <el-table :data="menuList" stripe style="width: 100%" border row-key="id" v-loading="loading"
-        :tree-props="{ children: 'children', hasChildren: 'hasChildren' }">
+      <el-table ref="tableRef" :data="menuList" stripe style="width: 100%" border row-key="id" v-loading="loading"
+        @selection-change="handleSelectionChange"
+        :tree-props="{ children: 'children', hasChildren: 'hasChildren', checkStrictly: true }">
         <template #empty>
           <img src="@/assets/img/empty.png" />
           <p style="font-size: 20px">Nothing to load....</p>
         </template>
-        <!-- <el-table-column type="index" width="50" align="center" /> -->
+        <el-table-column type="selection" width="50" align="center" />
         <el-table-column prop="title" label="标题" width="120" align="center"></el-table-column>
         <el-table-column prop="name" label="菜单编码" width="120" align="center"></el-table-column>
-        <el-table-column prop="path" label="路由路径" width="180" align="center"></el-table-column>
+        <el-table-column prop="path" label="访问路由" width="180" align="center"></el-table-column>
         <el-table-column prop="component" label="组件路径" width="240" align="center"></el-table-column>
         <el-table-column prop="icon" label="图标" width="120" align="center">
           <template #default="scope">
@@ -50,10 +46,8 @@
         <el-table-column prop="permission" label="权限标识" width="230" align="center"></el-table-column>
         <el-table-column label="操作" align="center">
           <template #default="scope">
-            <el-button type="primary" size="small" v-if="scope.row.type == 1" @click="handleAdd(null, scope.row.id)">添加</el-button>
-            <el-button type="primary" plain size="small" @click="hadnleUpdate(scope.row.id)">
-              更改上级
-            </el-button>
+            <el-button type="primary" size="small" v-if="scope.row.type == 1"
+              @click="handleAdd(null, scope.row.id)">添加子项</el-button>
             <el-button type="primary" size="small" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button type="danger" size="small" @click="handleDelete(scope.row)">删除</el-button>
           </template>
@@ -63,7 +57,28 @@
     <el-pagination v-model:current-page="page.page" v-model:page-size="page.size" :page-sizes="[20, 50, 100, 200]"
       background layout="total, sizes, prev, pager, next, jumper" :total="page.total" @size-change="handleSizeChange"
       @current-change="query" />
-    <EditForm :key="formKey" :type="addType" @close="handleClose" :title="title" :row-id="selectedId" :dialogVisible="dialogVisible" :parentId="parentId"/>
+    <EditForm :key="formKey" :type="addType" @close="handleClose" :title="title" :row-id="selectedId"
+      :dialogVisible="dialogVisible" :parentId="parentId" />
+    <el-dialog v-model="menuDirTreeVisible" width="500px" :title="'选择上级目录'">
+      <el-tree ref="menuDirTree" :data="dirMenuList" show-checkbox
+        :props="{ id: 'id', label: 'title', children: 'children', hasChildren: 'children', checkStrictly: true }" node-key="id"
+        default-expand-all @node-click="handleNodeClick">
+        <template #default="scope">
+          <el-icon>
+            <component :is="getIconComponent(scope.node.data.icon)" />
+          </el-icon>
+          <span>{{ scope.node.data.title }}</span>
+        </template>
+        <template #empty>
+          <img src="@/assets/img/empty.png" />
+          <p style="font-size: 20px">Nothing to load....</p>
+        </template>
+      </el-tree>
+      <template #footer>
+        <el-button @click="menuDirTreeVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleUpdate">确定</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -83,6 +98,10 @@ const emptyPage = {
 const searchParam = ref({
   parentId: '0'
 })
+const menuDirTreeVisible = ref(false)
+const menuDirTree = ref(null)
+const tableRef = ref(null)
+const dirMenuList = ref([])
 const menuList = ref([])
 const page = ref(emptyPage)
 const loading = ref(false)
@@ -93,8 +112,8 @@ const selectedId = ref(null)
 const formKey = ref(0)
 const addType = ref(1)
 const parentId = ref('')
+const selectMenus = ref([])
 // Computed
-
 // Emits
 const emit = defineEmits([
 
@@ -111,7 +130,6 @@ onMounted(() => {
 })
 
 // Watchers
-
 // Methods
 const query = () => {
   loading.value = true
@@ -129,15 +147,44 @@ const query = () => {
 }
 
 const handleAdd = (type, pid) => {
-  if(type){
+  if (type) {
     addType.value = type
   }
-  if(pid){
+  if (pid) {
     parentId.value = pid
   }
   title.value = '新增系统菜单'
   dialogVisible.value = true
   formKey.value = Math.random()
+}
+
+const handleSelectionChange = (selection) => {
+  selectMenus.value = selection
+}
+
+const handleChangeParent = () => {
+  menuApi.treePage({
+      parentId: '0',
+      type: 1
+    }, 1, 500).then(res => {
+      if (res.code !== 200) {
+        ElMessage.error(res.message)
+        return
+      }
+      dirMenuList.value = res.data.records
+      menuDirTreeVisible.value = true
+    })
+}
+
+const handleCreatDir = () => {
+  title.value = '新增菜单目录'
+  dialogVisible.value = true
+  formKey.value = Math.random()
+  addType.value = 1
+}
+
+const handleUpdate = () => { 
+  menuDirTreeVisible.value = false
 }
 
 
@@ -167,6 +214,8 @@ const reset = () => {
 const handleClose = () => {
   selectedId.value = null
   dialogVisible.value = false
+  addType.value = null
+  parentId.value = ''
   query()
 }
 const handleEdit = (row) => {
