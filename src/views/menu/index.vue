@@ -61,7 +61,7 @@
       :dialogVisible="dialogVisible" :parentId="parentId" />
     <el-dialog v-model="menuDirTreeVisible" width="500px" :title="'选择上级目录'">
       <el-tree ref="menuDirTree" :data="dirMenuList" show-checkbox
-        :props="{ id: 'id', label: 'title', children: 'children', hasChildren: 'children', checkStrictly: true }" node-key="id"
+        :props="{ id: 'id', label: 'title', children: 'children', hasChildren: 'hasChildren', checkStrictly: true }" node-key="id"
         default-expand-all @node-click="handleNodeClick">
         <template #default="scope">
           <el-icon>

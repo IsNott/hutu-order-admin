@@ -26,13 +26,13 @@
           <img src="@/assets/img/empty.png" />
           <p style="font-size: 20px">Nothing to load....</p>
         </template>
-        <el-table-column type="index" width="50" align="center" />
-        <el-table-column prop="role" label="角色名称" width="120" align="center"></el-table-column>
-        <el-table-column prop="remark" label="备注" width="120" align="center"></el-table-column>
+        <el-table-column type="index" width="100" align="center" />
+        <el-table-column prop="role" label="角色名称" width="200" align="center"></el-table-column>
+        <el-table-column prop="remark" label="备注" width="200" align="center"></el-table-column>
         <el-table-column label="操作" align="center">
           <template #default="scope">
-            <el-button type="primary" size="small" @click="handleSettingUser(scope.row)">设置用户</el-button>
-            <el-button type="primary" size="small" @click="handleSettingMenu(scope.row)">设置菜单</el-button>
+            <el-button type="primary" plain size="small" @click="handleSettingUser(scope.row)">设置用户</el-button>
+            <el-button  plain size="small" @click="handleSettingMenu(scope.row)">设置权限</el-button>
             <el-button type="primary" size="small" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button type="danger" size="small" @click="handleDelete(scope.row)">删除</el-button>
           </template>
@@ -44,11 +44,10 @@
       @current-change="query" />
     <EditForm :key="formKey" @close="handleClose" :title="title" :row-id="selectedId" :dialogVisible="dialogVisible" />
     <el-dialog title="设置用户" width="800px" v-model="settingUserVisiable" :before-close="handleUserDialogClose">
-      <el-table ref="userTableRef" :data="userList" style="width: 100%" border v-loading="userTableLoading"
-        @selection-change="handleSelectionChange">
-        <el-table-column type="selection" :selectable="checkSelectable" width="50" align="center" />
-        <el-table-column prop="realName" label="姓名" width="120" align="center"></el-table-column>
-        <el-table-column prop="username" label="用户名" width="120" align="center"></el-table-column>
+      <el-table ref="userTableRef" :data="userList" border v-loading="userTableLoading" style="width: 100%;margin-bottom: 20px;">
+        <el-table-column type="selection" width="50" align="center" />
+        <el-table-column prop="realName" label="姓名" align="center"></el-table-column>
+        <el-table-column prop="username" label="用户名" align="center"></el-table-column>
       </el-table>
       <template #footer>
         <el-button type="primary" @click="handleSettingUserConfirm">确定</el-button>
@@ -57,6 +56,13 @@
       <el-pagination v-model:current-page="userPage.page" v-model:page-size="userPage.size"
         :page-sizes="[20, 50, 100, 200]" background layout="total, sizes, prev, pager, next" :total="userPage.total"
         @size-change="handleUserPageChange" @current-change="queryUser" />
+    </el-dialog>
+    <el-dialog title="设置权限" width="800px" v-model="settingMenuVisiable" :before-close="handleMenuDialogClose">
+      <el-tree ref="menuTreeRef" :data="menuTreeData" style="max-width: 800px" :props="{ label: 'title', id: 'id', children: 'children', hasChildren: 'hasChildren' }" node-key="id" show-checkbox/>
+      <template #footer>
+        <el-button type="primary" @click="handleSettingMenuConfirm">确定</el-button>
+        <el-button @click="handleMenuDialogClose">取消</el-button>
+      </template>
     </el-dialog>
   </div>
 </template>
@@ -68,6 +74,8 @@ import EditForm from './components/EditForm.vue'
 import { roleApi } from './api'
 import { userApi } from '../user/api'
 import { userRoleApi } from '../user-role/api'
+import { roleMenuApi } from '../role-menu/api'
+import { menuApi } from '../menu/api'
 // Data
 const emptySearchParam = {}
 const emptyPage = {
@@ -91,6 +99,11 @@ const userList = ref([])
 const userTableRef = ref(null)
 const currentRole = ref(null)
 const selectedUser = ref([])
+
+const settingMenuVisiable = ref(false)
+const roleMenuList = ref([])
+const menuTreeData = ref([])
+const menuTreeRef = ref(null)
 // Computed
 
 // Emits
@@ -173,6 +186,27 @@ const handleSettingUser = (row) => {
 
 }
 
+const handleSettingMenuConfirm = () => { 
+  const roleId = currentRole.value.id
+  const menuIds = menuTreeRef.value.getCheckedKeys()
+  roleMenuApi.setRoleMenus(roleId, menuIds).then(res => {
+    if (res.code !== 200) {
+      ElMessage.error(res.message)
+      return
+    }
+    ElMessage.success(res.message)
+    handleMenuDialogClose()
+   })
+}
+
+const handleMenuDialogClose = () => {
+  currentRole.value = null
+  roleMenuList.value = []
+  settingMenuVisiable.value = false
+  menuTreeData.value = []
+  menuTreeData.value = []
+}
+
 const handleUserPageChange = () => {
   queryUser()
 }
@@ -211,25 +245,42 @@ const handleSelectionChange = (selection) => {
   selectedUser.value = selection
 }
 
-const handleSettingUserConfirm = async () => {
-  try {
-    const needToAddList = selectedUser.value.filter(user => !user?.roles.map(role=>role.id).includes(currentRole.value.id))
-    if(!needToAddList || needToAddList.length == 0){
-      handleUserDialogClose()
+const handleSettingMenu = async (row) => {
+  currentRole.value = row
+  const resp = await roleMenuApi.queryByRoleId(row.id)
+  if (resp.code !== 200) {
+    ElMessage.error(resp.message)
+    return
+  }
+  roleMenuList.value = resp.data
+  menuApi.treePage({
+    parentId: 0
+  }, 1, 10).then(res => {
+    if (res.code !== 200) {
+      ElMessage.error(res.message)
       return
     }
-    await Promise.all(needToAddList.map(user => {
-      return userRoleApi.add({
-        roleId: currentRole.value.id,
-        userId: user.id
+    menuTreeData.value = res.data.records
+    settingMenuVisiable.value = true
+    if(menuTreeData.value){
+      nextTick(() => {
+        menuTreeRef.value.setCheckedKeys(roleMenuList.value.map(menu => menu.menuId))
       })
-    })).then(res => {
-      ElMessage.success('设置用户成功')
-      handleUserDialogClose()
-    })
-  } catch (error) {
-    console.error('设置用户失败:', error)
-  }
+    }
+  })
+}
+
+const handleSettingUserConfirm = async () => {
+  const roleId = currentRole.value.id
+  const userIds = userTableRef.value.getSelectionRows().map(user => user.id)
+  userRoleApi.setRoleUsers(roleId, userIds).then(res => {
+    if (res.code !== 200) {
+      ElMessage.error(res.message)
+      return
+    }
+    ElMessage.success(res.message)
+    handleUserDialogClose()
+  })
 }
 
 const handleSizeChange = (size) => {
