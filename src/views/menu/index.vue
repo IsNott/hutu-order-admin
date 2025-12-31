@@ -8,7 +8,7 @@
               <el-button type="primary" @click="handleCreatDir()">新增目录</el-button>
               <el-button type="primary" @click="handleAdd(2)">新增菜单</el-button>
               <el-button type="primary" plain v-if="selectMenus.length > 0" @click="handleChangeParent">
-                更改上级
+                变更上级
               </el-button>
               <el-button type="primary" @click="query">查询</el-button>
               <el-button @click="reset">重置</el-button>
@@ -61,8 +61,7 @@
       :dialogVisible="dialogVisible" :parentId="parentId" />
     <el-dialog v-model="menuDirTreeVisible" width="500px" :title="'选择上级目录'">
       <el-tree ref="menuDirTree" :data="dirMenuList" show-checkbox
-        :props="{ id: 'id', label: 'title', children: 'children', hasChildren: 'hasChildren', checkStrictly: true }" node-key="id"
-        default-expand-all @node-click="handleNodeClick">
+        :props="{ id: 'id', label: 'title', children: 'children', hasChildren: 'hasChildren' }" node-key="id">
         <template #default="scope">
           <el-icon>
             <component :is="getIconComponent(scope.node.data.icon)" />
@@ -183,8 +182,22 @@ const handleCreatDir = () => {
   addType.value = 1
 }
 
-const handleUpdate = () => { 
-  menuDirTreeVisible.value = false
+const handleUpdate = () => {
+  const ids = tableRef.value.getSelectionRows().map(item => item.id)
+  const pids = menuDirTree.value.getCheckedKeys()
+  if(pids.length == 0){
+    ElMessage.error('请选择上级目录')
+    return
+  }
+  menuApi.updateParent(pids[0], ids).then(res => { 
+    if (res.code !== 200) {
+      ElMessage.error(res.message)
+      return
+    }
+    ElMessage.success(res.message)
+    menuDirTreeVisible.value = false
+    query()
+  })
 }
 
 

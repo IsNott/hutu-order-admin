@@ -251,7 +251,7 @@ const handleDelete = (row) => {
         return
       }
       ElMessage.success(res.message)
-      query()
+      queryItem()
     })
   })
 }

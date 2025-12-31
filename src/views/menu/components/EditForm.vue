@@ -21,7 +21,7 @@
         </el-col>
         <el-col :span="12">
           <el-form-item label="访问路由" prop="path">
-            <el-input v-model="editForm.path" :placeholder="'请输入访问路由'" />
+            <el-input v-model="editForm.path" :disabled="editForm.type == 1" :placeholder="'请输入访问路由'" />
           </el-form-item>
         </el-col>
       </el-row>

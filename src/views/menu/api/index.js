@@ -17,6 +17,9 @@ export const menuApi = {
         const id = data.id
         return put(`/sysMenu/update/${id}`, data)
     },
+    updateParent(newParentId, data) {
+        return put(`/sysMenu/updateParent/${newParentId}`, data)
+    },
     delete(id) {
         return del(`/sysMenu/delete/${id}`)
     },

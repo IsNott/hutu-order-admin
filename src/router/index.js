@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { isLoggedIn } from '@/utils/auth.js'
 import Layout from '@/views/layout/index.vue'
+import { CommonAPI } from '@/api'
 
 const routes = [
   {
@@ -10,7 +11,7 @@ const routes = [
     meta: {
       title: '登录',
       noLayout: true,
-      hide: true
+      visible: false
     }
   },
   {
@@ -21,168 +22,123 @@ const routes = [
       title: '404',
       noLayout: true,
       requiresAuth: false,
-      hide: true
-    }
-  },
-  {
-    path: '/:pathMatch(.*)*',
-    redirect: '/404',
-    meta: {
-      title: '404',
-      noLayout: true,
-      hide: true
+      visible: false
     }
   },
   {
     path: '/',
     name: 'layout',
     component: Layout,
-    redirect: '/home',
     meta: { requiresAuth: true },
-    children: [
-      {
-        path: 'home',
-        name: 'home',
-        component: () => import('@/views/home/index.vue'),
-        meta: {
-          title: '首页',
-          icon: 'home'
-        }
-      },
-      {
-        path: 'store',
-        name: 'store',
-        component: () => import('@/views/store/index.vue'),
-        meta: {
-          title: '门店管理',
-          icon: 'shop'
-        }
-      },
-      {
-        path: '/system',
-        name: 'system-management',
-        meta: {
-          title: '系统管理',
-          icon: 'setting'
-        },
-        children: [
-          {
-        path: 'user',
-        name: 'user',
-        component: () => import('@/views/user/index.vue'),
-        meta: {
-          title: '用户管理',
-          icon: 'user'
-        }
-      },
-      {
-        path: 'role',
-        name: 'role',
-        component: () => import('@/views/role/index.vue'),
-        meta: {
-          title: '角色管理',
-          icon: 'team'
-        }
-      },
-      {
-        path: 'menu',
-        name: 'menu',
-        component: () => import('@/views/menu/index.vue'),
-        meta: {
-          title: '菜单管理',
-          icon: 'safety-certificate'
-        }
-      },
-        ]
-      },
-      {
-        path: 'sku',
-        name: 'sku',
-        component: () => import('@/views/sku/index.vue'),
-        meta: {
-          title: 'SKU管理',
-          icon: 'appstore'
-        }
-      },
-      {
-        path: 'goods',
-        name: 'goods',
-        component: () => import('@/views/goods/index.vue'),
-        meta: {
-          title: '商品管理',
-          icon: 'gift'
-        }
-      },
-      {
-        path: 'orders',
-        name: 'orders',
-        component: () => import('@/views/orders/index.vue'),
-        meta: {
-          title: '订单管理',
-          icon: 'solution'
-        }
-      },
-      {
-        path: 'playImage',
-        name: 'play-image',
-        component: () => import('@/views/play-image/index.vue'),
-        meta: {
-          title: '轮播图管理',
-          icon: 'picture'
-        }
-      },
-      {
-        path: 'catalog',
-        name: 'catalog',
-        component: () => import('@/views/catalog/index.vue'),
-        meta: {
-          title: '分类管理',
-          icon: 'cluster'
-        }
-      },
-      {
-        path: 'dict',
-        name: 'dict',
-        component: () => import('@/views/data-dict/index.vue'),
-        meta: {
-          title: '字典管理',
-          icon: 'book'
-        }
-      }
-    ]
+    children: []
   },
 ]
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes
 })
 
-// 路由守卫
-router.beforeEach((to, from, next) => {
-  // 设置页面标题
+let dynamicRoutesLoaded = false
+let loadingPromise = null
+
+let dynamicRoutes = []
+
+const createRouteFromMenuItem = (item) => {
+  const componentPath = item.component.split('/')
+  let component = ''
+  if (componentPath.length == 3) {
+    component = () => import(`../views/${componentPath[1]}/${componentPath[2]}.vue`)
+  } else if (componentPath.length == 1 && componentPath[0] !== '') {
+    component = () => import(`../views/${componentPath[0]}.vue`)
+  }
+  const route = {
+    path: item.path,
+    name: item.name,
+    component: component,
+    meta: {
+      title: item.title,
+      icon: item.icon,
+      requiresAuth: true,
+      visible: item.visible,
+      permission: item.permission,
+      type: item.type
+    }
+  }
+
+  if (item.children && item.children.length > 0) {
+    route.children = item.children.map(child => createRouteFromMenuItem(child))
+  }
+
+  return route
+}
+
+const addDynamicRoutes = async () => {
+  const res = await CommonAPI.getMenu()
+  if (res.code === 200) {
+    dynamicRoutes = []
+
+    res.data.forEach(item => {
+      const route = createRouteFromMenuItem(item)
+      router.addRoute('layout', route)
+      dynamicRoutes.push(route)
+    })
+
+    dynamicRoutesLoaded = true
+
+  }
+}
+
+const loadDynamicRoutes = async () => {
+  if (dynamicRoutesLoaded) {
+    return true
+  }
+
+  if (!loadingPromise) {
+    loadingPromise = addDynamicRoutes()
+  }
+
+  await loadingPromise
+  return true
+}
+
+router.beforeEach(async (to, from, next) => {
   if (to.meta.title) {
     document.title = `${to.meta.title} - hutu-admin`
   }
 
-  if(!router.hasRoute(to.name)){
-    next('/404')
-    return
-  }
-  
-  // 登录页面直接放行
   if (to.path === '/login') {
     next()
     return
   }
-  
-  // 检查登录状态
-  if (!isLoggedIn() && to.meta.requiresAuth) {
+
+  if (!isLoggedIn() && to.meta.requiresAuth !== false) {
     next('/login')
     return
   }
-  
+
+  if (isLoggedIn()) {
+    if (!dynamicRoutesLoaded) {
+      await loadDynamicRoutes()
+      next(to.path)
+    }
+    const currentRouteMatched = to.matched.length > 0
+
+    if (!currentRouteMatched && to.path !== '/404') {
+      next('/404')
+      return
+    }
+  }
+
+  if (to.path === '/') {
+    next('/home')
+    return
+  }
+
   next()
 })
+
+if (isLoggedIn()) {
+  loadDynamicRoutes()
+}
 
 export default router

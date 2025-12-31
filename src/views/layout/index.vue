@@ -40,12 +40,6 @@
           <RecursiveMenu :menu-items="sortedMenuList" @select="handleSelect" />
         </el-menu>
       </div>
-      <!-- <div class="sidebar" :class="{ 'sidebar-collapsed': isCollapsed }">
-        <MainMenu 
-          :is-collapse="isCollapsed"
-          @menu-click="handleMenuClick"
-        />
-      </div> -->
 
       <div class="content">
         <div class="breadcrumb">
@@ -76,11 +70,9 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { CommonAPI } from '@/api'
 import RecursiveMenu from '@/components/RecursiveMenu.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
-import MainMenu from '@/components/MainMenu.vue'
 
 const router = useRouter()
 const route = useRoute()
-const isCollapsed = ref(false)
 const loggedIn = ref(checkIsLoggedIn())
 const breadcrumb = ref([])
 const menuList = ref([])
@@ -95,19 +87,16 @@ const showMainContainer = computed(() => {
   return loggedIn.value && route.path !== '/login'
 })
 
-const handleMenuClick = (event) => {
-  console.log('菜单点击:', event)
-}
 
 const sortedMenuList = computed(() => {
-  return [...menuList.value].sort((a, b) => a.index - b.index)
+  return [...menuList.value].sort((a, b) => a.sort - b.sort)
 })
 
 const activeMenu = computed(() => {
   const findMenuIndex = (menus, path, parentIndex = '') => {
     for (let i = 0; i < menus.length; i++) {
       const menu = menus[i]
-      const currentIndex = parentIndex ? `${parentIndex}-${menu.index}` : `${menu.index}`
+      const currentIndex = parentIndex ? `${parentIndex}-${menu.sort}` : `${menu.sort}`
 
       if (menu.path === path) {
         return currentIndex
@@ -203,7 +192,7 @@ const handleSelect = (index) => {
     if (indexes.length === 0) return null
 
     const currentIndex = indexes[0]
-    const menuItem = menuItems.find(item => item.index === currentIndex)
+    const menuItem = menuItems.find(item => item.sort === currentIndex)
 
     if (!menuItem) return null
 

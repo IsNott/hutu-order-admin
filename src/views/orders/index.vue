@@ -132,7 +132,7 @@ const treeData = computed(() => {
     const val = stores.value[i]
     if (!val) return
     treeData.push({
-      label: val.name,
+      label: val.shopName,
       id: val.id,
       index: i + 1,
       children: val?.children || []

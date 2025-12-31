@@ -1,13 +1,13 @@
 <!-- components/RecursiveMenu.vue -->
 <template>
-  <template v-for="item in menuItems" :key="item.index">
+  <template v-for="item in menuItems" :key="item.sort">
     <!-- 没有子菜单的项 -->
     <el-menu-item v-if="!item.hasChildren" :index="getIndexPath(item)">
       <!-- <svg-icon :icon-class="item.icon" /> -->
       <el-icon>
         <component :is="getIconComponent(item.icon)" />
       </el-icon>
-      <span>{{ item.name }}</span>
+      <span>{{ item.title }}</span>
     </el-menu-item>
 
     <!-- 有子菜单的项 -->
@@ -16,7 +16,7 @@
         <el-icon>
           <component :is="getIconComponent(item.icon)" />
         </el-icon>
-        <span>{{ item.name }}</span>
+        <span>{{ item.title }}</span>
       </template>
       <!-- 递归调用 -->
       <RecursiveMenu :menu-items="item.children" :parent-index="getIndexPath(item)" @select="$emit('select', $event)" />
@@ -53,7 +53,7 @@ const emit = defineEmits(['select'])
 
 const getIndexPath = (item) => {
   return props.parentIndex
-    ? `${props.parentIndex}-${item.index}`
-    : item.index.toString()
+    ? `${props.parentIndex}-${item.sort}`
+    : item.sort.toString()
 }
 </script>

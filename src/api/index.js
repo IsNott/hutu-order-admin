@@ -6,7 +6,7 @@ export const CommonAPI = {
 
   },
   getMenu() {
-    return get(`/menu`)
+    return get(`/sysMenu/menu`)
   },
   login(data) {
     return post(`/auth/login`, data)
