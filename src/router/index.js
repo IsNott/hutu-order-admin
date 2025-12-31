@@ -44,7 +44,7 @@ let loadingPromise = null
 let dynamicRoutes = []
 
 const createRouteFromMenuItem = (item) => {
-  const componentPath = item.component.split('/')
+  const componentPath = item.component && item.component.includes('/') ? item.component.split('/') : ''
   let component = ''
   if (componentPath.length == 3) {
     component = () => import(`../views/${componentPath[1]}/${componentPath[2]}.vue`)

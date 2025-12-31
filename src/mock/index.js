@@ -55,7 +55,7 @@ Mock.Random.extend({
 
 // Mock.mock(/login/, 'post', authTemplate.login)
 // Mock.mock(/user\/info/, 'get', authTemplate.getUserInfo)
-Mock.mock(/menu/, 'get', authTemplate.getMenu)
+// Mock.mock(/menu/, 'get', authTemplate.getMenu)
 
 Mock.mock(/store\/page\/\d+\/\d+/, 'post', storeTemplate.query)
 Mock.mock(/store\/details\/\d+/, 'get', storeTemplate.detail)
