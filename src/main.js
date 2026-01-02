@@ -4,7 +4,7 @@
 //   })
 // }
 import { createApp } from 'vue'
-import('./mock')
+// import('./mock')
 import App from './App.vue'
 import router from './router'
 import ElementPlus from 'element-plus'

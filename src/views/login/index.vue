@@ -53,7 +53,7 @@ import { CommonAPI as loginApi } from '@/api'
 const router = useRouter()
 
 // Data
-const redirect = ref('/')
+const redirect = ref('/home')
 const loginForm = ref({
   username: '',
   password: ''

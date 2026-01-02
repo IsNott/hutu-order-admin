@@ -34,18 +34,18 @@ export default defineConfig({
     },
     proxy: {
       '^/api': {
-        target: `http://localhost:10220/hutu-admin`,
+        target: `http://127.0.0.1:10220/hutu-admin`,
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api/, '')
       },
       // 静态文件
       '^/static': {
-        target: 'http://localhost:10220',
+        target: 'http://127.0.0.1:10220',
         changeOrigin: true,
 
       },
       '^/upload': {
-        target: 'http://localhost:10220/hutu-oss',
+        target: 'http://127.0.0.1:10220/hutu-oss',
         rewrite: path => path.replace(/^\/upload/, ''),
         changeOrigin: true,
       }
