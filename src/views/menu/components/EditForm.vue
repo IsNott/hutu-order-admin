@@ -16,7 +16,7 @@
       <el-row>
         <el-col :span="12">
           <el-form-item label="组件路径">
-            <el-input v-model="editForm.component" :disabled="editForm.type == 1" :placeholder="'请输入组件路径(前端组件路径)'" />
+            <el-input v-model="editForm.component" :disabled="editForm.type == 1" :placeholder="'请输入组件路径(相对/src/views, 不需要带.vue后缀)'" />
           </el-form-item>
         </el-col>
         <el-col :span="12">
