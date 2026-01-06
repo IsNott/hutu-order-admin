@@ -1,6 +1,9 @@
 import { get, post, put, del } from '@/utils/request'
 
 export const slideShowApi = {
+    queryAll(data) {
+        return post(`/sysSlideShow/queryAll`, data)
+    },
     queryPage(data, page, size) {
         return post(`/sysSlideShow/page/${page}/${size}`, data)
     },

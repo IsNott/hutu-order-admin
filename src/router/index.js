@@ -5,6 +5,16 @@ import { CommonAPI } from '@/api'
 
 const routes = [
   {
+    path: '/home',
+    name: 'Home',
+    component: () => import('@/views/home/index.vue'),
+    meta: {
+      title: '首页',
+      noLayout: true,
+      visible: false
+    }
+  },
+  {
     path: '/login',
     name: 'login',
     component: () => import('@/views/login/index.vue'),

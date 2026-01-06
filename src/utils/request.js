@@ -16,7 +16,7 @@ service.interceptors.request.use(
   config => {
     // 从本地存储获取token
     const token = getToken()
-
+    // console.log('token:', token);
     if (token) {
       config.headers['token'] = token
     } else {

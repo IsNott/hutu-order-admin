@@ -61,7 +61,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, computed, watch, defineExpose } from 'vue'
+import { ref, defineProps, computed, watch, defineExpose, onMounted } from 'vue'
 import { getToken } from '@/utils/auth'
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
@@ -83,7 +83,7 @@ const props = defineProps({
   },
   accept: {
     type: String,
-    default: 'image/jpeg, image/png'
+    default: 'image/png,image/jpg,image/jpeg'
   },
   drag: {
     type: Boolean,
@@ -94,8 +94,8 @@ const props = defineProps({
     default: false
   },
   data: {
-    type: Object,
-    default: () => ({})
+    type: [Array, String],
+    default: () => ([])
   },
   fileLimit: {
     type: Number,
@@ -120,12 +120,22 @@ defineExpose({
   fileList,getFileRequest
 })
 
+onMounted(()=>{
+  if(props.data){
+    setFileList(props.data)
+  }
+})
 
 
 watch(() => props.data, (newValue) => {
   if (newValue) {
-    if (Array.isArray(newValue)) {
-      fileList.value = newValue.map(item => {
+    setFileList(newValue)
+  }
+})
+
+const setFileList = (val) => {
+  if (Array.isArray(val)) {
+      fileList.value = val.map(item => {
         return {
           url: item.url,
           name: item.fileName,
@@ -134,17 +144,16 @@ watch(() => props.data, (newValue) => {
           response: item
         }
       })
-    } else if (typeof newValue === 'string') {
+    } else if (typeof val === 'string') {
       fileList.value = [{
-        url: newValue,
+        url: val,
         name: '文件',
-        uid: '1',
+        uid: new Date().getTime(),
         status: 'success',
-        response: newValue
+        response: val
       }]
     }
-  }
-})
+}
 
 const handleSuccess = (resp, uploadFile) => {
   if (resp.code === 200) {
@@ -189,8 +198,8 @@ const handleRemove = (uploadFile, uploadFiles) => {
 
 <style scoped>
 .uploader .img {
-  width: 178px;
-  height: 178px;
+  width: 128px;
+  height: 128px;
   display: block;
 }
 
@@ -204,8 +213,8 @@ const handleRemove = (uploadFile, uploadFiles) => {
 /* 图片容器样式 */
 .image-container {
   position: relative;
-  width: 178px;
-  height: 178px;
+  width: 128px;
+  height: 128px;
   border: 1px solid #e0e0e0;
   border-radius: 6px;
   overflow: hidden;

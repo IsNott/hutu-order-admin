@@ -1,10 +1,11 @@
 <template>
   <el-dialog :title="title" :model-value="dialogVisible" width="1200px" :before-close="handleClose">
     <el-form ref="editFormRef" :rules="rules" :model="editForm" label-width="100px">
-      <el-form-item label="类型" prop="type">
-        <el-select v-model="editForm.type" placeholder="请选择类型" style="width: 100%" disabled>
-          <el-option v-for="item in slideShowData" :label="item.name" :value="item.type" :key="item.id"/>
-        </el-select>
+      <el-form-item label="分类名称" prop="name">
+        <el-input v-model="editForm.name" :placeholder="'请输入分类名称'" />
+      </el-form-item>
+      <el-form-item label="分类值" prop="type">
+        <el-input v-model.number="editForm.type" :placeholder="'请输入分类值'" />
       </el-form-item>
       <el-form-item label="开始时间" prop="availableStartTime">
         <el-date-picker style="width: 100%" v-model="editForm.availableStartTime" type="date"
@@ -26,16 +27,16 @@
           <div v-if="slideShowItems.length > 0" class="image-table-header">
             <el-row class="table-header-row">
               <el-col :span="4">图片</el-col>
+              <el-col :span="4">跳转链接</el-col>
               <el-col :span="4">排序</el-col>
-              <el-col :span="6">跳转链接</el-col>
-              <el-col :span="3">是否富文本</el-col>
-              <el-col :span="3">是否外链</el-col>
+              <el-col :span="4">是否富文本</el-col>
+              <el-col :span="4">是否外链</el-col>
               <el-col :span="4">操作</el-col>
             </el-row>
           </div>
 
           <div class="image-table-body">
-            <el-row v-for="(item, index) in slideShowItems" :key="item?.id" class="table-row" :gutter="10">
+            <el-row v-for="(item, index) in slideShowItems" :key="index" class="table-row" :gutter="10">
               <el-col :span="4">
                 <el-form-item :prop="`slideShowItems[${index}].attachUrl`">
                   <Uploader
@@ -43,31 +44,33 @@
                     :data="item.attachUrl"
                     :drag="false"
                     :size="2"
+                    :accept="'.jpg,.png'"
                     :tip="'文件最大2MB, 仅支持jpg、png格式'"
                     :multiple="false"
                   />
                 </el-form-item>
               </el-col>
-              <el-col :span="4">
-                <el-form-item :prop="`slideShowItems[${index}].sortOrder`">
-                  <el-input-number v-model="item.sortOrder" :min="0" :step="1" size="small" placeholder="排序"
-                    style="width: 80%" />
-                </el-form-item>
-              </el-col>
 
-              <el-col :span="6">
+              <el-col :span="4">
                 <el-form-item :prop="`slideShowItems[${index}].navigateUrl`">
                   <el-input v-model="item.navigateUrl" placeholder="请输入跳转链接" size="small" />
                 </el-form-item>
               </el-col>
 
-              <el-col :span="3">
+              <el-col :span="4">
+                <el-form-item :prop="`slideShowItems[${index}].sortIndex`">
+                  <el-input-number v-model="item.sortIndex" :min="0" :step="1" size="small" placeholder="排序"
+                    style="width: 80%" />
+                </el-form-item>
+              </el-col>
+
+              <el-col :span="4">
                 <el-form-item label-width="0">
                   <el-switch v-model="item.richText" active-text="是" inactive-text="否" />
                 </el-form-item>
               </el-col>
 
-              <el-col :span="3">
+              <el-col :span="4">
                 <el-form-item label-width="0">
                   <el-switch v-model="item.outside" active-text="是" inactive-text="否" />
                 </el-form-item>
@@ -77,19 +80,8 @@
                 <el-button type="danger" size="small" icon="Delete" @click="handleRemoveImageRow(index)">
                   删除
                 </el-button>
-                <!-- <el-button v-if="index != 0" size="small" icon="Top" @click="handleMoveUp(index)">
-                  上移
-                </el-button> -->
-                <!-- <el-button v-if="index != slideShowItems.length - 1" size="small" icon="Bottom"
-                  @click="handleMoveDown(index)">
-                  下移
-                </el-button> -->
               </el-col>
             </el-row>
-          </div>
-
-          <div v-if="slideShowItems.length === 0" class="empty-state">
-            <el-empty description="暂无图片，点击上方按钮添加" />
           </div>
         </div>
       </el-form-item>
@@ -114,10 +106,6 @@ const props = defineProps({
     type: String,
     default: '操作'
   },
-  rowId: {
-    type: Number,
-    required: true,
-  },
   dialogVisible: {
     type: Boolean,
     default: false
@@ -130,12 +118,18 @@ const editForm = ref(empty)
 const editFormRef = ref(null)
 const slideShowItems = ref([])
 const uploaderList = ref([])
-const slideShowData = ref([])
 const rules = {
   type:[
     {
       required: true,
       message: '请选择类型',
+      trigger: 'blur'
+    }
+  ],
+  name: [
+    {
+      required: true,
+      message: '请输入名称',
       trigger: 'blur'
     }
   ],
@@ -156,24 +150,6 @@ const rules = {
 }
 
 onMounted(async () => {
-  if (props.rowId) {
-    slideShowApi.details(props.rowId).then(res => {
-      if (res.code !== 200) {
-        ElMessage.error(res.message)
-        return
-      }
-      editForm.value = res.data
-      console.log('details', res.data);
-      slideShowItems.value = res.data.slideShowItems
-    })
-    slideShowApi.queryAll().then(res => { 
-      if (res.code !== 200) {
-        ElMessage.error(res.message)
-        return
-      }
-      slideShowData.value = res.data
-    })
-  }
 })
 
 const setUploader = (el, index) => {
@@ -224,14 +200,6 @@ const updateSortValues = () => {
   })
 }
 
-const handleImageChange = (file, fileList, index) => {
-  slideShowItems.value[index].imageList = fileList
-}
-
-const handleImageRemove = (file, fileList, index) => {
-  slideShowItems.value[index].imageList = fileList
-}
-
 const submitEdit = () => {
   editFormRef.value?.validate(async (valid) => {
     if (!valid) {
@@ -245,7 +213,8 @@ const submitEdit = () => {
       ...editForm.value,
       slideShowItems: slideShowItems.value
     }
-    const res = await slideShowApi.update(submitData)
+    const apiCall = slideShowApi.add
+    const res = await apiCall(submitData)
     if (res.code !== 200) {
       ElMessage.error(res.message)
       return
@@ -256,7 +225,7 @@ const submitEdit = () => {
 }
 
 const handleClose = () => {
-  emit('update:editDialogVisible', false)
+  emit('update:dialogVisible', false)
   emit('close')
   editForm.value = { }
   slideShowItems.value = []

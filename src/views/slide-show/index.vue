@@ -16,7 +16,7 @@
         <el-row>
           <el-col :span="12">
             <el-form-item>
-              <el-button type="primary" @click="handleAdd">新增</el-button>
+              <el-button type="primary" @click="handleAdd">新增分类</el-button>
               <el-button type="primary" @click="query">查询</el-button>
               <el-button @click="reset">重置</el-button>
             </el-form-item>
@@ -31,12 +31,9 @@
           <p style="font-size: 20px">Nothing to load....</p>
         </template>
         <el-table-column type="index" width="50" align="center" />
+        <el-table-column prop="name" label="名称" width="120" align="center">
+        </el-table-column>
         <el-table-column prop="type" label="类型" width="120" align="center">
-          <template #default="scope">
-            <span v-if="scope.row.type == 0">首页轮播</span>
-            <span v-if="scope.row.type == 1">活动轮播</span>
-            <span v-if="scope.row.type == 2">活动卡片</span>
-          </template>
         </el-table-column>
         <el-table-column label="可用时间" width="120" align="center">
           <template #default="scope">
@@ -57,7 +54,8 @@
     <el-pagination v-model:current-page="page.page" v-model:page-size="page.size" :page-sizes="[20, 50, 100, 200]"
       background layout="total, sizes, prev, pager, next, jumper" :total="page.total" @size-change="handleSizeChange"
       @current-change="query" />
-    <EditForm :key="formKey" @close="handleClose" :title="title" :row-id="selectedId" :dialogVisible="dialogVisible" />
+    <EditForm :key="formKey" @close="handleEditClose" :title="title" :row-id="selectedId" :dialogVisible="editDialogVisible" />
+    <AddForm :key="formKey" @close="handleClose" :title="title" :dialogVisible="dialogVisible" />
   </div>
 </template>
 
@@ -65,6 +63,7 @@
 import { ref, reactive, onMounted, defineProps, defineEmits, watch, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import EditForm from './components/EditForm.vue'
+import AddForm from './components/AddForm.vue'
 import { slideShowApi } from './api'
 // Data
 const emptySearchParam = {}
@@ -80,6 +79,7 @@ const loading = ref(false)
 const queryForm = ref(null)
 const title = ref('新增 ')
 const dialogVisible = ref(false)
+const editDialogVisible = ref(false)
 const selectedId = ref(null)
 const formKey = ref(0)
 // Computed
@@ -152,11 +152,18 @@ const handleClose = () => {
   dialogVisible.value = false
   query()
 }
+
+const handleEditClose = () => {
+  selectedId.value = null
+  editDialogVisible.value = false
+  query()
+}
+
 const handleEdit = (row) => {
   title.value = '编辑 '
-  dialogVisible.value = true
   selectedId.value = row.id
   formKey.value = Math.random()
+  editDialogVisible.value = true
 }
 const handleDelete = (row) => {
   ElMessageBox.confirm('确定要删除吗？', '提示', {
