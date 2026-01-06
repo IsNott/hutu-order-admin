@@ -58,8 +58,8 @@
               </el-col>
 
               <el-col :span="4">
-                <el-form-item :prop="`slideShowItems[${index}].sortIndex`">
-                  <el-input-number v-model="item.sortIndex" :min="0" :step="1" size="small" placeholder="排序"
+                <el-form-item :prop="`slideShowItems[${index}].sortOrder`">
+                  <el-input-number v-model="item.sortOrder" :min="0" :step="1" size="small" placeholder="排序"
                     style="width: 80%" />
                 </el-form-item>
               </el-col>
@@ -196,7 +196,7 @@ const handleMoveDown = (index) => {
 
 const updateSortValues = () => {
   slideShowItems.value.forEach((item, index) => {
-    item.sort = index + 1
+    item.sortOrder = index + 1
   })
 }
 

@@ -117,7 +117,11 @@ router.beforeEach(async (to, from, next) => {
   }
 
   if (to.path === '/login') {
-    next()
+    if (isLoggedIn()) {
+      next('/home')
+    } else {
+      next()
+    }
     return
   }
 
