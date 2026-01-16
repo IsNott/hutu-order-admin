@@ -14,6 +14,7 @@
     :on-remove="handleRemove" 
     :headers="headers"
     :limit="props.fileLimit"
+    :on-error="handleError"
   >
     <el-icon class="uploader-icon" v-if="props.type === 'img'">
       <Plus />
@@ -63,6 +64,7 @@
 <script setup>
 import { ref, defineProps, computed, watch, defineExpose, onMounted } from 'vue'
 import { getToken } from '@/utils/auth'
+import { ElMessage } from 'element-plus'
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
 const action = import.meta.env.VITE_APP_BASE_API + import.meta.env.VITE_APP_UPLOAD_URL + '/oss/upload'
@@ -153,6 +155,11 @@ const setFileList = (val) => {
         response: val
       }]
     }
+}
+
+const handleError = (err, file, fileList) => {
+  console.log(err, file, fileList)
+  ElMessage.error('上传失败')
 }
 
 const handleSuccess = (resp, uploadFile) => {

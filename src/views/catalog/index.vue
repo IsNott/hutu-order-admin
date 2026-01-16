@@ -11,25 +11,25 @@
       <div class="query-form">
         <el-form ref="queryForm" :model="searchParam" label-width="80px">
           <el-row gutter="10">
-            <el-col :span="6">
+            <el-col :span="6" :xs="24" :sm="12" :md="12" :lg="12" :xl="6">
               <el-form-item label="名称">
                 <el-input clearable v-model="searchParam.menuCatalogName" placeholder="请输入名称" />
               </el-form-item>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="6" :xs="24" :sm="12" :md="12" :lg="12" :xl="6">
               <el-form-item label="创建时间">
                 <el-date-picker v-model="searchParam.createTime" placeholder="请输入创建时间" type="date" style="width: 100%"
                   value-format="yyyy-MM-dd" />
               </el-form-item>
             </el-col>
           </el-row>
-          <el-row>
-            <el-col :span="12">
+          <el-row>  
+            <el-col :span="24">
               <el-form-item>
                 <el-button type="primary" @click="handleAdd">新增</el-button>
                 <el-button type="primary" @click="queryCatalog">查询</el-button>
                 <el-button @click="reset">重置</el-button>
-                <el-button type="primary" v-if="catalogList.length > 0" @click="handleCopy">复制到其他门店</el-button>
+                <el-button type="primary" v-if="catalogList.length > 0" @click="handleCopy" plain >复制</el-button>
               </el-form-item>
             </el-col>
           </el-row>

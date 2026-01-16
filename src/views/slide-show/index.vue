@@ -31,11 +31,11 @@
           <p style="font-size: 20px">Nothing to load....</p>
         </template>
         <el-table-column type="index" width="50" align="center" />
-        <el-table-column prop="name" label="名称" width="120" align="center">
+        <el-table-column prop="name" label="名称" width="400" align="center">
         </el-table-column>
-        <el-table-column prop="type" label="类型" width="120" align="center">
+        <el-table-column prop="type" label="类型值" width="120" align="center">
         </el-table-column>
-        <el-table-column label="可用时间" width="120" align="center">
+        <el-table-column label="可用时间" width="360" align="center">
           <template #default="scope">
             <el-tag v-if="scope.row.availableStartTime">{{ scope.row.availableStartTime }}</el-tag>
             <el-tag v-if="scope.row.availableEndTime">{{ scope.row.availableEndTime }}</el-tag>
