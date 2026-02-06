@@ -83,7 +83,7 @@ const handleLogin = () => {
         Promise.resolve().then(() => {
           router.push(redirect.value)
           ElMessage.success('登录成功')
-          window.refresh()
+          window.location.reload();
         })
       }).finally(() => {
         loading.value = false
